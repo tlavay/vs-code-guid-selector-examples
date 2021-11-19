@@ -1,0 +1,1 @@
+export const guidTokenPattern: RegExp = /[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g;
