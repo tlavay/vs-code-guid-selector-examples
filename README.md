@@ -156,7 +156,7 @@ export class GuidHoverProvider {
 
 ```typescript
 const highlightGuidCommandProvider = new HighlightGuidCommandProvider();
-context.subscriptions.push(vscode.commands.registerCommand('vs-code-guid-selector-examples.hightlight-all-guids', highlightGuidCommandProvider.HighlightAllGuidsCommand));
+context.subscriptions.push(vscode.commands.registerCommand('vs-code-guid-selector-examples.hightlight-all-guids', highlightGuidCommandProvider.highlightAllGuidsCommand));
 ```
 
 - Discuss active text editor
