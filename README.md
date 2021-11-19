@@ -234,7 +234,7 @@ public async openGuidFileAndHighlight() : Promise<void> {
         const selection = await vscode.window.showQuickPick(fileNames, inputBoxOptions);
 
         if (selection) {
-            const fileUri = vscode.Uri.file(`${folderDirectoryPath}\\${selection}`);
+            const fileUri = vscode.Uri.joinPath(directoryUri, selection);
             await vscode.window.showTextDocument(fileUri);
             await vscode.commands.executeCommand('vs-code-guid-selector-examples.hightlight-all-guids');
         }
