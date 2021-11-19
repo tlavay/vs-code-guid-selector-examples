@@ -1,70 +1,232 @@
-# vs-code-guid-selector-examples README
+# VS Code Guid Selector Demo
 
-This is the README for your extension "vs-code-guid-selector-examples". After writing up a brief description, we recommend including the following sections.
+## Agenda
 
-## Features
+- Getting Started
+- Activation Events
+- Hover Providers
+- Windows
+- Quick Picks
+- Commands
+- Highlighter
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## Helpful Links
 
-For example if there is an image subfolder under your extension project workspace:
+- [Getting Started](https://code.visualstudio.com/api/get-started/your-first-extension)
+- [Activation Events](https://code.visualstudio.com/api/references/activation-events)
+- [vscode-extension-samples](https://github.com/microsoft/vscode-extension-samples)
+- [Tyler Git Hub](https://github.com/tlavay/vs-code-guid-selector-demo)
 
-\!\[feature X\]\(images/feature-x.png\)
+## Getting Started Steps
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+1. Open Terminal ```ctrl+shift+~```
+2. Run ```npm install -g yo generator-code```
+3. Run ```yo code```
+4. Follow instructions in ternminal
 
-## Requirements
+## Important Files
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- package.json > activationEvents
+  - This controls when your ```vscode``` extension is activated.
+  - Do not use ```*```
+  - We want to have our extension start on startup so we will use the recommened and safe ```onStartupFinished```
+  - We should probably use ```onLanguage``` but for simplicity we will use ```onStartupFinished```
 
-## Extension Settings
+## Below is demo notes
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## Hover Provider
 
-For example:
+- Goto Guid Hover Provider
+  - talk about vscode.hoverProvider
 
-This extension contributes the following settings:
+- Add Hover Provider to extension.ts
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+```typescript
+const guidHoverProvider = new GuidHoverProvider();
+context.subscriptions.push(vscode.languages.registerHoverProvider('json', guidHoverProvider.checkCursorOnGuid()));
+```
+  
+```typescript
+  const hoverProvider = (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) => {
+        const range = document.getWordRangeAtPosition(position);
+        const result = document.getText(range);
+  
+        if (result.match(/[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g)
+        {
+            return new vscode.Hover(`Cool! ${result} is a guid!`);
+        }
+    };
+```
 
-## Known Issues
+- Markdown in hover provider
+  - What is Guid link: http://guid.one/guid
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+ ```typescript
+ const hoverProvider = (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) => {
+        const range = document.getWordRangeAtPosition(position);
+        const result = document.getText(range);
+  
+        if (result.match(/[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g))
+        {
+            var markdown = new vscode.MarkdownString();
+            markdown.appendMarkdown('To learn more about guids, goto to [What is a guid](http://guid.one/guid)');
+            markdown.appendCodeblock(`const hoverProvider = (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) => {
+                const range = document.getWordRangeAtPosition(position);
+                const result = document.getText(range);
+          
+                if (result.match('[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?'))
+                {
+                    var markdown = new vscode.MarkdownString();
+                    markdown.appendMarkdown('To learn more about guids, goto to [What is a guid](http://guid.one/guid)');
+                    markdown.appendCodeblock()
+                    return new vscode.Hover(markdown);
+                }
+            };`, 'typescript');
+            return new vscode.Hover(markdown);
+        }
+    };
+```
 
-## Release Notes
+- Show information box
 
-Users appreciate release notes as you update your extension.
+```typescript
+const hoverProvider = (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) => {
+            const range = document.getWordRangeAtPosition(position);
+            const result = document.getText(range);
+    
+            if (result.match(/[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g))
+            {
+                vscode.window.showInformationMessage(`Cool! ${result} is a guid!`);
+                return new vscode.Hover('');
+            }
+        };
+```
 
-### 1.0.0
+- Show quick pick
 
-Initial release of ...
+```typescript
+const hoverProvider = async (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) => {
+            const range = document.getWordRangeAtPosition(position);
+            const result = document.getText(range);
+    
+            if (result.match(/[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g))
+            {
+                const quickPicks = [ 'I think so', 'I dont know much about guids', 'Yes', 'Everything is a guid', 'No' ];
+                var selection = await vscode.window.showQuickPick(quickPicks);
+                if (selection === 'I dont know much about guids') {
+                    vscode.window.showErrorMessage('Bad developer...');
+                } else if (selection === 'Yes') {
+                    vscode.window.showInformationMessage('Correct!!');
+                }
+                
+                return new vscode.Hover('');
+            }
+        };
+```
 
-### 1.0.1
+## Commands
 
-Fixed issue #.
+- Show Package.json
+  - change activation event
+  - ```"onCommand:vs-code-guid-selector-examples.hightlight-all-guids"```
+  - Show contributes section
+  - add
 
-### 1.1.0
+- Add Command
 
-Added features X, Y, and Z.
+```json
+{
+  "command": "vs-code-guid-selector-examples.hightlight-all-guids",
+  "category": "Guid",
+  "title": "Highlight"
+}
+```
 
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
+- add command to activation method
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+```typescript
+const highlightGuidCommandProvider = new HighlightGuidCommandProvider();
+context.subscriptions.push(vscode.commands.registerCommand('vs-code-guid-selector-examples.hightlight-all-guids', highlightGuidCommandProvider.HighlightAllGuidsCommand));
+```
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+- Discuss active text editor
+- Discuss document
 
-## Working with Markdown
+```typescript
+public highlightAllGuidsCommand() {
+    const activeTextEditor = vscode.window.activeTextEditor;
+    const document = activeTextEditor?.document;
 
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+    if (document) {
+      const documentText = document.getText();
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
+      let match: any;
+      const guids: vscode.DecorationOptions[] = [];
+      while ((match =  constants.guidTokenPattern.exec(documentText))) {
+        const startPos = document.positionAt(match.index);
+        const endPos = document.positionAt(match.index + match[0].length);
+        const decoration = { range: new vscode.Range(startPos, endPos) };
+        guids.push(decoration);
+      }
 
-### For more information
+      const decorationType = vscode.window.createTextEditorDecorationType({
+        color: "white",
+        backgroundColor: "#0078d4",
+        overviewRulerLane: vscode.OverviewRulerLane.Right,
+      });
+      activeTextEditor.setDecorations(decorationType, guids);
+    }
+  }
+```
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+### Open Document
 
-**Enjoy!**
+- Open document
+  - Show how to search specific folder directory
+  - Open file
+
+- Add command to packages.json
+
+```json
+{
+  "command": "vs-code-guid-selector-examples.open-guid-file",
+  "category": "Guid",
+  "title": "Open & Highlight"
+}
+```
+
+``` "onCommand:vs-code-guid-selector-examples.open-guid-file" ```
+
+- Add to activation function
+
+```typescript
+const openFileProvider = new OpenFileCommandProvider();
+context.subscriptions.push(vscode.commands.registerCommand('vs-code-guid-selector-examples.open-guid-file', openFileProvider.openGuidFileAndHighlight));
+```
+
+```typescript
+public async openGuidFileAndHighlight() : Promise<void> {
+        const folderDirectoryPath = 'C:\\Users\\tnlav\\Downloads\\Guid Demo Folder';
+
+        const directoryUri = vscode.Uri.file(folderDirectoryPath);
+        const files = await vscode.workspace.fs.readDirectory(directoryUri);
+        const fileNames: string[] = [];
+        for (let i = 0; i < files.length; i++){
+            const currentFile = files[i];
+            const fileName = currentFile[0];
+            fileNames.push(fileName);
+        }
+        
+        const inputBoxOptions: vscode.QuickPickOptions = {
+            title: 'Select Guid File To Open...',
+            canPickMany: false
+        };
+        const selection = await vscode.window.showQuickPick(fileNames, inputBoxOptions);
+
+        if (selection) {
+            const fileUri = vscode.Uri.file(`${folderDirectoryPath}\\${selection}`);
+            await vscode.window.showTextDocument(fileUri);
+            await vscode.commands.executeCommand('vs-code-guid-selector-examples.hightlight-all-guids');
+        }
+    }
+```
