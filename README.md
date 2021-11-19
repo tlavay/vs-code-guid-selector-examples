@@ -104,8 +104,12 @@ const hoverProvider = (document: vscode.TextDocument, position: vscode.Position,
 
 - Show quick pick
 
+- copy whole class!
+
 ```typescript
-const hoverProvider = async (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) => {
+export class GuidHoverProvider {
+    public async checkCursorOnGuid() : Promise<vscode.HoverProvider> {
+        const hoverProvider = async (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) => {
             const range = document.getWordRangeAtPosition(position);
             const result = document.getText(range);
     
@@ -122,6 +126,12 @@ const hoverProvider = async (document: vscode.TextDocument, position: vscode.Pos
                 return new vscode.Hover('');
             }
         };
+
+        return {
+            provideHover: hoverProvider
+        };
+    }
+} 
 ```
 
 ## Commands
