@@ -51,7 +51,7 @@ context.subscriptions.push(vscode.languages.registerHoverProvider('json', guidHo
         const range = document.getWordRangeAtPosition(position);
         const result = document.getText(range);
   
-        if (result.match(/[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g)
+        if (result.match(constants.guidTokenPattern)
         {
             return new vscode.Hover(`Cool! ${result} is a guid!`);
         }
@@ -66,7 +66,7 @@ context.subscriptions.push(vscode.languages.registerHoverProvider('json', guidHo
         const range = document.getWordRangeAtPosition(position);
         const result = document.getText(range);
   
-        if (result.match(/[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g))
+        if (result.match(constants.guidTokenPattern))
         {
             var markdown = new vscode.MarkdownString();
             markdown.appendMarkdown('To learn more about guids, goto to [What is a guid](http://guid.one/guid)');
@@ -94,7 +94,7 @@ const hoverProvider = (document: vscode.TextDocument, position: vscode.Position,
             const range = document.getWordRangeAtPosition(position);
             const result = document.getText(range);
     
-            if (result.match(/[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g))
+            if (result.match(constants.guidTokenPattern))
             {
                 vscode.window.showInformationMessage(`Cool! ${result} is a guid!`);
                 return new vscode.Hover('');
@@ -109,7 +109,7 @@ const hoverProvider = async (document: vscode.TextDocument, position: vscode.Pos
             const range = document.getWordRangeAtPosition(position);
             const result = document.getText(range);
     
-            if (result.match(/[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?/g))
+            if (result.match(constants.guidTokenPattern))
             {
                 const quickPicks = [ 'I think so', 'I dont know much about guids', 'Yes', 'Everything is a guid', 'No' ];
                 var selection = await vscode.window.showQuickPick(quickPicks);
